@@ -17,6 +17,7 @@ Para un correcto funcionamiento es necesario instalar:
  ```sudo apt-get install sqlite3 ```
  
  - Librería de ThingSpeak
+ 
  ```sudo pip install thingspeak```
    
 ## Base de Datos ##
