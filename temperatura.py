@@ -6,6 +6,7 @@ import adafruit_dht
 import requests
 import math
 import sqlite3
+import thingspeak
 from sqlite3 import Error
 from datetime import datetime
 
@@ -62,6 +63,11 @@ def telegram_bot_sendtext(bot_message):
     response = requests.get(send_text)
     return response.json()
 
+def envio_datos_thingspeak(channel, temperatura, humedad, indice_calor):
+    try:
+        response = channel.update({'field1': temperatura, 'field2': humedad, 'field3': indice_calor})
+    except:
+        telegram_bot_sendtext('Error envio ThingSpeak')
 
 def main():
     db = r"/home/pi/datostemperatura.db"
@@ -69,7 +75,11 @@ def main():
     conn = crear_conexion(db)
     pin = 23
     sensor = adafruit_dht.DHT11(pin)
-
+    # Canales de comunicación con ThingSpeak
+    channel_id = 1592347
+    write_key = 'OXMV3W0L5I73CN0V'
+    channel = thigspeak.Channel(id=channel_id, write_key=write_key)
+    
     with conn:
        humedad = sensor.humidity
        temperatura = sensor.temperature
@@ -82,7 +92,7 @@ def main():
        #mensaje = 'Fecha: ' + dt_ahora + ' / Temperatura: ' + str(temperatura) + 'ºC Humedad: ' + str(humedad)
        #print(mensaje)
        telegram_bot_sendtext(mensaje)
- 
+       envio_datos_thingspeak(channel, humedad, temperatura, indice_calor)
 
 if __name__ == '__main__':
     main()
